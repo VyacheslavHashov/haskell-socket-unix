@@ -18,7 +18,7 @@ import System.Socket.Family.Unix
 main :: IO ()
 main = defaultMain $ testGroup "unix domain socket"
     [ groupUnixPathname
-    -- , groupAbstractName
+    , groupAbstractName
     ]
 
 unixPath :: IsString a => a
@@ -58,5 +58,28 @@ groupUnixPathname = testGroup "Unix path name"
     ]
 
 groupAbstractName :: TestTree
-groupAbstractName = undefined
+groupAbstractName = testGroup "Abstract path name"
+    [ testCase "connect to non-existing path name" $ bracket
+        unixSocket
+        close
+        (\s -> do
+            r <- try $ connect s (fromJust $ socketAddressUnixAbstract abstractPath)
+            case r of
+                Left e | e == eConnectionRefused -> return ()
+                       | otherwise               -> throwIO e
+                Right () -> assertFailure "connection should have failed"
+        )
+    , testCase "server\\client" $ bracket
+        ( (,) <$> unixSocket <*> unixSocket)
+        (\(server, client) -> do
+            close server
+            close client
+        )
+        (\(server, client) -> do
+            let addr = fromJust $ socketAddressUnixAbstract abstractPath
+            bind server addr
+            listen server 5
+            connect client addr
+        )
+    ]
 
