@@ -2,8 +2,10 @@
 module Main where
 
 import Control.Exception (bracket, catch, throwIO, try)
+import           Control.Concurrent.Async (async, wait)
 import Data.Maybe (fromJust)
 import Data.String (IsString)
+import Control.Monad (when)
 import Data.ByteString (ByteString)
 import Test.Tasty
 import Test.Tasty.HUnit
@@ -49,13 +51,25 @@ groupUnixPathname = testGroup "Unix path name"
             close client
             removeLink unixPath
         )
-        (\(server, client) -> do
-            let addr = fromJust $ socketAddressUnixPath unixPath
-            bind server addr
-            listen server 5
-            connect client addr
-        )
+        (testServerClient . fromJust $ socketAddressUnixPath unixPath)
     ]
+
+testServerClient
+    :: SocketAddress Unix
+    -> (Socket Unix Stream Unix, Socket Unix Stream Unix)
+    -> IO ()
+testServerClient addr (server, client) = do
+    let messageSent = "Hello, World!"
+    bind server addr
+    listen server 5
+    serverRecv <- async $ do
+        (peerSock, peerAddr) <- accept server
+        receive peerSock 4096 mempty
+    connect client addr
+    send client messageSent mempty
+    messageReceived <- wait serverRecv
+    when (messageReceived /= messageSent) $
+        assertFailure "Received message is invalid"
 
 groupAbstractName :: TestTree
 groupAbstractName = testGroup "Abstract path name"
@@ -75,11 +89,6 @@ groupAbstractName = testGroup "Abstract path name"
             close server
             close client
         )
-        (\(server, client) -> do
-            let addr = fromJust $ socketAddressUnixAbstract abstractPath
-            bind server addr
-            listen server 5
-            connect client addr
-        )
+        (testServerClient . fromJust $ socketAddressUnixAbstract abstractPath)
     ]
 
