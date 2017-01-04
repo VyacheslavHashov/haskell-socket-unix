@@ -9,6 +9,7 @@ import Foreign.Ptr
 import Foreign.Storable
 import Foreign.Marshal.Utils (fillBytes, copyBytes)
 import Data.ByteString (ByteString)
+import qualified Data.ByteString as B
 import Data.ByteString.Unsafe (unsafeUseAsCStringLen)
 import Data.Word (Word16)
 
@@ -27,13 +28,37 @@ data Unix
 instance Family Unix where
     familyNumber _ = (#const AF_UNIX)
 
+-- TODO move to main repository
 instance Protocol Unix where
     protocolNumber _ = 0
 
--- | A Unix socket address
+-- | A Unix socket address 
 data instance SocketAddress Unix
-    = SocketAddressUnix { unixPath :: ByteString }
+    = SocketAddressUnixPath ByteString 
+    | SocketAddressUnixAbstract ByteString
     deriving (Eq, Show)
+
+-- | The maximal length of a path. 1 byte is reserved for null byte.
+-- TODO docs about number
+maxPathLength :: Int
+maxPathLength = 107
+
+-- TODO better names?
+socketAddressUnixPath :: ByteString -> Maybe (SocketAddress Unix)
+socketAddressUnixPath path 
+    | B.length path <= maxPathLength = Just $ SocketAddressUnixPath path
+    | otherwise = Nothing
+
+socketAddressUnixAbstract :: ByteString -> Maybe (SocketAddress Unix)
+socketAddressUnixAbstract path 
+    | len <= maxPathLength = Just . SocketAddressUnixAbstract $
+        path `B.append` B.replicate (maxPathLength - len) 0
+    | otherwise = Nothing
+  where len = B.length path
+
+getUnixPath :: SocketAddress Unix -> Maybe (ByteString)
+getUnixPath (SocketAddressUnixPath path) = Just path
+getUnixPath _ = Nothing
 
 instance Storable (SocketAddress Unix) where
     sizeOf    _ = (#size struct sockaddr_un)
@@ -44,8 +69,11 @@ instance Storable (SocketAddress Unix) where
     poke ptr socketAddress = do
         fillBytes ptr 0 (#const sizeof(struct sockaddr_un))
         poke (sun_family ptr) ((#const AF_UNIX) :: Word16)
-        unsafeUseAsCStringLen (unixPath socketAddress) $ \(src, len) ->
-            copyBytes (sun_path ptr) src len
+        case socketAddress of
+            SocketAddressUnixPath path -> unsafeUseAsCStringLen path $
+                \(src, len) -> copyBytes (sun_path ptr) src len
+            SocketAddressUnixAbstract path -> unsafeUseAsCStringLen path $
+                \(src, len) -> copyBytes (sun_path ptr `plusPtr` 1) src len
       where
         sun_family = (#ptr struct sockaddr_un, sun_family)
         sun_path   = (#ptr struct sockaddr_un, sun_path)
