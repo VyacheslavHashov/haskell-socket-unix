@@ -11,7 +11,7 @@ import Foreign.Marshal.Utils (fillBytes, copyBytes)
 import Data.ByteString (ByteString)
 import qualified Data.ByteString as B
 import Data.ByteString.Unsafe (unsafeUseAsCStringLen)
-import Data.Word (Word16)
+import Data.Word (Word16, Word8)
 
 import System.Socket (Family(..), SocketAddress(..), Protocol(..))
 
@@ -65,7 +65,14 @@ instance Storable (SocketAddress Unix) where
     alignment _ = (#alignment struct sockaddr_un)
 
     peek ptr = do
-        undefined
+        first <- peek (sun_path ptr) :: IO Word8
+        case first of
+            0 -> SocketAddressUnixAbstract <$> 
+                    B.packCStringLen (castPtr $ sun_path ptr `plusPtr` 1, maxPathLength)
+            _ -> SocketAddressUnixPath <$> B.packCString (castPtr $ sun_path ptr)
+      where
+        sun_path   = (#ptr struct sockaddr_un, sun_path)
+
     poke ptr socketAddress = do
         fillBytes ptr 0 (#const sizeof(struct sockaddr_un))
         poke (sun_family ptr) ((#const AF_UNIX) :: Word16)
