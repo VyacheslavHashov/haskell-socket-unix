@@ -1,4 +1,4 @@
-name:                haskell-socket-unix
+name:                socket-unix
 version:             0.1.0.0
 synopsis:            Initial project template from stack
 description:         Please see README.md
@@ -8,7 +8,7 @@ license-file:        LICENSE
 author:              Vyacheslav Hashov
 maintainer:          vyacheslavhashov@gmail.com
 copyright:           2017 Vyacheslav Hashov
-category:            Web
+category:            System, Network
 build-type:          Simple
 extra-source-files:  README.md
 cabal-version:       >=1.10
@@ -20,21 +20,36 @@ library
                      , socket
                      , bytestring
 
+  ghc-options:         -Wall
   default-language:    Haskell2010
 
-test-suite haskell-socket-unix-test
+test-suite default
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             test.hs
   build-depends:       base
                      , socket
-                     , haskell-socket-unix
+                     , socket-unix
                      , tasty
                      , tasty-hunit
                      , bytestring
                      , unix
                      , async
-  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
+  default-language:    Haskell2010
+
+test-suite threaded
+  type:                exitcode-stdio-1.0
+  hs-source-dirs:      test
+  main-is:             test.hs
+  build-depends:       base
+                     , socket
+                     , socket-unix
+                     , tasty
+                     , tasty-hunit
+                     , bytestring
+                     , unix
+                     , async
+  ghc-options:         -threaded
   default-language:    Haskell2010
 
 source-repository head

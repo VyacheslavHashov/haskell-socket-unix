@@ -18,7 +18,7 @@ import           Data.ByteString (ByteString)
 import           Data.ByteString.Unsafe (unsafeUseAsCStringLen)
 import qualified Data.ByteString as B
 
-import          System.Socket (Family(..), SocketAddress(..), Protocol(..))
+import          System.Socket (Family(..), SocketAddress, Protocol(..))
 
 #include "hs_socket.h"
 
