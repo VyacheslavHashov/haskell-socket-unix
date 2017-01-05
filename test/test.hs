@@ -1,15 +1,15 @@
 {-# language OverloadedStrings #-}
 module Main where
 
+import Control.Concurrent.Async (async, wait)
 import Control.Exception (bracket, throwIO, try)
-import           Control.Concurrent.Async (async, wait)
+import Control.Monad (when)
 import Data.Maybe (fromJust)
 import Data.String (IsString)
-import Control.Monad (when)
 import Data.ByteString (ByteString)
+import System.Posix.Files (removeLink, fileExist)
 import Test.Tasty
 import Test.Tasty.HUnit
-import System.Posix.Files (removeLink, fileExist)
 
 import System.Socket
 import System.Socket.Type.Stream
@@ -19,28 +19,8 @@ import System.Socket.Family.Unix
 
 main :: IO ()
 main = defaultMain $ testGroup "unix domain socket"
-    [
-     groupUnixPathname
-     , groupAbstractName
-    ]
-
-unixPath :: IsString a => a
-unixPath = "Woum5ag3oohuaLee.socket"
-
-clientUnixPath :: IsString a => a
-clientUnixPath = "Io4meo0epoquashi.socket"
-
-abstractPath :: ByteString
-abstractPath = "/tmp/uth4Aechiereejae.socket"
-
-clientAbstractPath :: ByteString
-clientAbstractPath = "/tmp/FieNg4shamo4Thie.socket"
-
-unixSocketStream :: IO (Socket Unix Stream Unix)
-unixSocketStream = socket
-
-unixSocketDatagram :: IO (Socket Unix Datagram Unix)
-unixSocketDatagram = socket
+    [ groupUnixPathname
+    , groupAbstractName ]
 
 groupUnixPathname :: TestTree
 groupUnixPathname = testGroup "Unix path name"
@@ -73,8 +53,8 @@ groupUnixPathname = testGroup "Unix path name"
         close client
         unlink unixPath
         unlink clientUnixPath
+    -- Sockets with real pathname should be unlinked after closing
     unlink path = fileExist path >>= flip when (removeLink path)
-
 
 groupAbstractName :: TestTree
 groupAbstractName = testGroup "Abstract path name"
@@ -105,8 +85,29 @@ groupAbstractName = testGroup "Abstract path name"
         close client
 
 
+clientMessage :: ByteString
 clientMessage = "client message"
+
+serverMessage :: ByteString
 serverMessage = "server message"
+
+unixPath :: IsString a => a
+unixPath = "Woum5ag3oohuaLee.socket"
+
+clientUnixPath :: IsString a => a
+clientUnixPath = "Io4meo0epoquashi.socket"
+
+abstractPath :: ByteString
+abstractPath = "/tmp/uth4Aechiereejae.socket"
+
+clientAbstractPath :: ByteString
+clientAbstractPath = "/tmp/FieNg4shamo4Thie.socket"
+
+unixSocketStream :: IO (Socket Unix Stream Unix)
+unixSocketStream = socket
+
+unixSocketDatagram :: IO (Socket Unix Datagram Unix)
+unixSocketDatagram = socket
 
 testServerClientStream
     :: SocketAddress Unix
@@ -122,12 +123,11 @@ testServerClientStream addr (server, client) = do
         pure r
     connect client addr
     send client clientMessage mempty
+
     clientMessageReceived <- wait serverRecv
     serverMessageReceived <- receive client 4096 mempty
-    when (clientMessageReceived /= clientMessage) $
-        assertFailure "Received client message is invalid"
-    when (serverMessageReceived /= serverMessage) $
-        assertFailure "Received server message is invalid"
+    clientMessageReceived @?= clientMessage
+    serverMessageReceived @?= serverMessage
 
 testServerClientDatagram
     :: SocketAddress Unix
@@ -142,11 +142,9 @@ testServerClientDatagram sAddr cAddr (server, client) = do
         sendTo server serverMessage mempty peerAddr
         pure r
     sendTo client clientMessage mempty sAddr
+
     clientMessageReceived <- wait serverRecv
     serverMessageReceived <- receive client 4096 mempty
-
-    when (clientMessageReceived /= clientMessage) $
-        assertFailure "Received client message is invalid"
-    when (serverMessageReceived /= serverMessage) $
-        assertFailure "Received server message is invalid"
+    clientMessageReceived @?= clientMessage
+    serverMessageReceived @?= serverMessage
 
