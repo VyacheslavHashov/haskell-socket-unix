@@ -4,6 +4,10 @@ sudo: false
 # Do not choose a language; we provide our own build tools.
 language: generic
 
+env:
+  - STACK_YAML=stack.yaml
+  - STACK_YAML=stack-ghc.7.10.3.yaml
+
 # Caching so the next build will be fast too.
 cache:
   directories:
