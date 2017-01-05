@@ -2,18 +2,23 @@
 {-# language FlexibleInstances #-}
 
 module System.Socket.Family.Unix 
+    ( Unix
+    , SocketAddress
+    , socketAddressUnixPath
+    , socketAddressUnixAbstract
+    , getUnixPath
+    ) where
 
-where
+import           Foreign.Ptr (castPtr, plusPtr)
+import           Foreign.Storable (Storable(..))
+import           Foreign.Marshal.Utils (fillBytes, copyBytes)
 
-import Foreign.Ptr
-import Foreign.Storable
-import Foreign.Marshal.Utils (fillBytes, copyBytes)
-import Data.ByteString (ByteString)
+import           Data.Word (Word16, Word8)
+import           Data.ByteString (ByteString)
+import           Data.ByteString.Unsafe (unsafeUseAsCStringLen)
 import qualified Data.ByteString as B
-import Data.ByteString.Unsafe (unsafeUseAsCStringLen)
-import Data.Word (Word16, Word8)
 
-import System.Socket (Family(..), SocketAddress(..), Protocol(..))
+import          System.Socket (Family(..), SocketAddress(..), Protocol(..))
 
 #include "hs_socket.h"
 
