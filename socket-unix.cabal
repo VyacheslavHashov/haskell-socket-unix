@@ -1,7 +1,6 @@
 name:                socket-unix
 version:             0.1.0.0
-synopsis:            A Unix domain socket extension for the socket library
-description:         Please see README.md
+description:         A Unix domain socket extension for the socket library
 homepage:            https://github.com/vyacheslavhashov/haskell-socket-unix#readme
 license:             MIT 
 license-file:        LICENSE
