@@ -11,6 +11,8 @@ module System.Socket.Family.Unix
     , socketAddressUnixPath
     , socketAddressUnixAbstract
     , getUnixPath
+    -- * Exceptions
+    , eNoEntry
     ) where
 
 import           Foreign.Ptr (castPtr, plusPtr)
@@ -22,7 +24,8 @@ import           Data.ByteString (ByteString)
 import           Data.ByteString.Unsafe (unsafeUseAsCStringLen)
 import qualified Data.ByteString as B
 
-import          System.Socket (Family(..), SocketAddress, Protocol(..))
+import          System.Socket (Family(..), SocketAddress, Protocol(..),
+                               SocketException(..))
 
 #include "hs_socket.h"
 
@@ -80,6 +83,10 @@ socketAddressUnixAbstract path
 getUnixPath :: SocketAddress Unix -> Maybe (ByteString)
 getUnixPath (SocketAddressUnixPath path) = Just path
 getUnixPath _ = Nothing
+
+-- | > SocketException "No such file or directory"
+eNoEntry :: SocketException
+eNoEntry = SocketException (#const ENOENT)
 
 -- For implementation details see @man unix@
 instance Storable (SocketAddress Unix) where
