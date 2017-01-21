@@ -4,6 +4,9 @@ sudo: false
 # Do not choose a language; we provide our own build tools.
 language: generic
 
+os:
+  - linux
+  - osx
 env:
   - STACK_YAML=stack.yaml
   - STACK_YAML=stack-ghc7.10.3.yaml

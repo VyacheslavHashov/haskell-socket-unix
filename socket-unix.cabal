@@ -1,5 +1,5 @@
 name:                socket-unix
-version:             0.1.0.0
+version:             0.1.1.0
 synopsis:            Unix domain sockets
 description:         A Unix domain socket extension for the socket library
 homepage:            https://github.com/vyacheslavhashov/haskell-socket-unix#readme
@@ -17,6 +17,8 @@ library
   hs-source-dirs:      src
   if os(linux)
     hs-source-dirs:    platform/linux
+  if os(osx) || os(darwin) || os(freebsd) || os(openbsd) || os(netbsd) || os(solaris)
+    hs-source-dirs:    platform/unix
   exposed-modules:     System.Socket.Family.Unix
   other-modules:       System.Socket.Family.Unix.Internal
                        System.Socket.Family.Unix.Platform
