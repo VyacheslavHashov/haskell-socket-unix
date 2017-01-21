@@ -15,7 +15,11 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
+  if os(linux)
+    hs-source-dirs:    platform/linux
   exposed-modules:     System.Socket.Family.Unix
+  other-modules:       System.Socket.Family.Unix.Internal
+                       System.Socket.Family.Unix.Platform
   build-depends:       base         >= 4.7      && < 5
                      , socket       >= 0.6.0.0  && < 0.8.0.0
                      , bytestring   >= 0.10.0.0 && < 0.11

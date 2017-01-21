@@ -5,14 +5,11 @@
 {-# language TypeFamilies #-}
 {-# language FlexibleInstances #-}
 
-module System.Socket.Family.Unix
-    ( Unix
-    , SocketAddress
+module System.Socket.Family.Unix.Platform
+    ( SocketAddress
     , socketAddressUnixPath
     , socketAddressUnixAbstract
     , getUnixPath
-    -- * Exceptions
-    , eNoEntry
     ) where
 
 import           Foreign.Ptr (castPtr, plusPtr)
@@ -24,24 +21,14 @@ import           Data.ByteString (ByteString)
 import           Data.ByteString.Unsafe (unsafeUseAsCStringLen)
 import qualified Data.ByteString as B
 
-import          System.Socket (Family(..), SocketAddress, Protocol(..),
-                               SocketException(..))
+import           System.Socket (SocketAddress)
+import           System.Socket.Family.Unix.Internal (Unix)
 
 #include "hs_socket.h"
 
 #if __GLASGOW_HASKELL__ < 800
 #let alignment t = "%lu", (unsigned long)offsetof(struct {char x__; t (y__); }, y__)
 #endif
-
--- | The [Unix domain socket]
--- (https://en.wikipedia.org/wiki/Unix_domain_socket)
-data Unix
-
-instance Family Unix where
-    familyNumber _ = (#const AF_UNIX)
-
-instance Protocol Unix where
-    protocolNumber _ = 0
 
 -- | A Unix socket address
 data instance SocketAddress Unix
@@ -83,10 +70,6 @@ socketAddressUnixAbstract path
 getUnixPath :: SocketAddress Unix -> Maybe (ByteString)
 getUnixPath (SocketAddressUnixPath path) = Just path
 getUnixPath _ = Nothing
-
--- | > SocketException "No such file or directory"
-eNoEntry :: SocketException
-eNoEntry = SocketException (#const ENOENT)
 
 -- For implementation details see @man unix@
 instance Storable (SocketAddress Unix) where
