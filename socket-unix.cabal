@@ -9,6 +9,7 @@ author:              Vyacheslav Hashov
 maintainer:          vyacheslavhashov@gmail.com
 copyright:           2017 Vyacheslav Hashov
 category:            System, Network
+stability:           Experimental
 build-type:          Simple
 extra-source-files:  README.md
 cabal-version:       >=1.10
