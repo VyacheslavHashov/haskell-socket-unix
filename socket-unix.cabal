@@ -38,6 +38,8 @@ test-suite default
   if os(osx) || os(darwin) || os(freebsd) || os(openbsd) || os(netbsd) || os(solaris)
     hs-source-dirs:    platform_test/unix
   main-is:             test.hs
+  other-modules:       Internal
+                       Platform
   build-depends:       base         >= 4.7      && < 5
                      , socket       >= 0.6.0.0  && < 0.8.0.0
                      , socket-unix
@@ -56,6 +58,8 @@ test-suite threaded
   if os(osx) || os(darwin) || os(freebsd) || os(openbsd) || os(netbsd) || os(solaris)
     hs-source-dirs:    platform_test/unix
   main-is:             test.hs
+  other-modules:       Internal
+                       Platform
   build-depends:       base         >= 4.7      && < 5
                      , socket       >= 0.6.0.0  && < 0.8.0.0
                      , socket-unix

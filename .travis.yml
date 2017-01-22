@@ -5,11 +5,11 @@ sudo: false
 language: generic
 
 os:
-  # - linux
+  - linux
   - osx
 env:
-  - STACK_YAML=stack.yaml
   - STACK_YAML=stack-ghc7.10.3.yaml
+  - STACK_YAML=stack-ghc8.0.2.yaml
 
 # Caching so the next build will be fast too.
 cache:
