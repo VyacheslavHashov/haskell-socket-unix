@@ -7,7 +7,7 @@ import Control.Monad (when)
 import Data.Maybe (fromJust)
 import Data.String (IsString)
 import Data.ByteString (ByteString)
-import System.Posix.Files (removeLink, fileExist)
+import System.Posix.Files.ByteString (removeLink, fileExist)
 import Test.Tasty
 import Test.Tasty.HUnit
 
@@ -56,19 +56,15 @@ clientMessage = "client message"
 serverMessage :: ByteString
 serverMessage = "server message"
 
--- TODO
-unixPath :: IsString a => a
+unixPath :: ByteString
 unixPath = "Woum5ag3oohuaLee.socket"
 
--- TODO
-clientUnixPath :: IsString a => a
+clientUnixPath :: ByteString
 clientUnixPath = "Io4meo0epoquashi.socket"
 
--- TODO
 abstractPath :: ByteString
 abstractPath = "/tmp/uth4Aechiereejae.socket"
 
--- TODO
 clientAbstractPath :: ByteString
 clientAbstractPath = "/tmp/FieNg4shamo4Thie.socket"
 
