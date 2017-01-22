@@ -23,7 +23,7 @@ address <- case socketAddressUnixPath "example.sock" of
 ### Symlinks
 Binding to a socket with a filename creates a socket in the filesystem, but does not unlink it after `close` called. You should handle deleting links yourself.
 ## Portability
-Only Linux is supported.
+Linux and OS X are supported.
 
 
 [badge-travis]: https://img.shields.io/travis/VyacheslavHashov/haskell-socket-unix.svg
