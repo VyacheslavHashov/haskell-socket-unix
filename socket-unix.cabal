@@ -32,6 +32,10 @@ library
 test-suite default
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
+  if os(linux)
+    hs-source-dirs:    platform_test/linux
+  if os(osx) || os(darwin) || os(freebsd) || os(openbsd) || os(netbsd) || os(solaris)
+    hs-source-dirs:    platform_test/unix
   main-is:             test.hs
   build-depends:       base         >= 4.7      && < 5
                      , socket       >= 0.6.0.0  && < 0.8.0.0
@@ -46,6 +50,10 @@ test-suite default
 test-suite threaded
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
+  if os(linux)
+    hs-source-dirs:    platform_test/linux
+  if os(osx) || os(darwin) || os(freebsd) || os(openbsd) || os(netbsd) || os(solaris)
+    hs-source-dirs:    platform_test/unix
   main-is:             test.hs
   build-depends:       base         >= 4.7      && < 5
                      , socket       >= 0.6.0.0  && < 0.8.0.0
