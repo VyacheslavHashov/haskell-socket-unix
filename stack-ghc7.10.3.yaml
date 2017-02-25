@@ -2,7 +2,8 @@ resolver: lts-6.27
 
 packages:
 - '.'
-extra-deps: []
+extra-deps: 
+    - socket-0.8.0.0
 
 # Override default flag values for local packages and extra-deps
 flags: {}

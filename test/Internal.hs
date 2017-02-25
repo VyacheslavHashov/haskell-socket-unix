@@ -14,6 +14,7 @@ import Test.Tasty.HUnit
 import System.Socket
 import System.Socket.Type.Stream
 import System.Socket.Type.Datagram
+import System.Socket.Protocol.Default
 import System.Socket.Family.Unix
 
 groupUnixPathname :: TestTree
@@ -68,15 +69,15 @@ abstractPath = "/tmp/uth4Aechiereejae.socket"
 clientAbstractPath :: ByteString
 clientAbstractPath = "/tmp/FieNg4shamo4Thie.socket"
 
-unixSocketStream :: IO (Socket Unix Stream Unix)
+unixSocketStream :: IO (Socket Unix Stream Default)
 unixSocketStream = socket
 
-unixSocketDatagram :: IO (Socket Unix Datagram Unix)
+unixSocketDatagram :: IO (Socket Unix Datagram Default)
 unixSocketDatagram = socket
 
 testServerClientStream
     :: SocketAddress Unix
-    -> (Socket Unix Stream Unix, Socket Unix Stream Unix)
+    -> (Socket Unix Stream Default, Socket Unix Stream Default)
     -> IO ()
 testServerClientStream addr (server, client) = do
     bind server addr
@@ -97,7 +98,7 @@ testServerClientStream addr (server, client) = do
 testServerClientDatagram
     :: SocketAddress Unix
     -> SocketAddress Unix
-    -> (Socket Unix Datagram Unix, Socket Unix Datagram Unix)
+    -> (Socket Unix Datagram Default, Socket Unix Datagram Default)
     -> IO ()
 testServerClientDatagram sAddr cAddr (server, client) = do
     bind server sAddr

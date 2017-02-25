@@ -8,7 +8,7 @@ module System.Socket.Family.Unix.Internal
     , eNoEntry
     ) where
 
-import System.Socket (Family(..), Protocol(..), SocketException(..))
+import System.Socket (SocketException(..))
 
 #include "hs_socket.h"
 
@@ -20,11 +20,6 @@ import System.Socket (Family(..), Protocol(..), SocketException(..))
 -- (https://en.wikipedia.org/wiki/Unix_domain_socket)
 data Unix
 
-instance Family Unix where
-    familyNumber _ = (#const AF_UNIX)
-
-instance Protocol Unix where
-    protocolNumber _ = 0
 
 -- | > SocketException "No such file or directory"
 eNoEntry :: SocketException

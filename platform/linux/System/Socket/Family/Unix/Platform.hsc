@@ -22,7 +22,7 @@ import           Data.ByteString (ByteString)
 import           Data.ByteString.Unsafe (unsafeUseAsCStringLen)
 import qualified Data.ByteString as B
 
-import           System.Socket (SocketAddress)
+import           System.Socket (SocketAddress, Family(..))
 import           System.Socket.Family.Unix.Internal (Unix)
 
 #include "hs_socket.h"
@@ -31,16 +31,19 @@ import           System.Socket.Family.Unix.Internal (Unix)
 #let alignment t = "%lu", (unsigned long)offsetof(struct {char x__; t (y__); }, y__)
 #endif
 
--- | A Unix socket address
-data instance SocketAddress Unix
-    -- | Address is connected to a filesystem pathname. When used to bind
-    -- a socket file with this name is created in the file system.
-    = SocketAddressUnixPath ByteString
-    -- | Address is in abstract namespace which is a Linux-specific feature
-    -- that allows us to bind a UNIX domain socket to a name without that
-    -- name being created in the file system.
-    | SocketAddressUnixAbstract ByteString
-    deriving (Eq, Show)
+instance Family Unix where
+    familyNumber _ = (#const AF_UNIX)
+
+    -- | A Unix socket address
+    data SocketAddress Unix
+        -- | Address is connected to a filesystem pathname. When used to bind
+        -- a socket file with this name is created in the file system.
+        = SocketAddressUnixPath ByteString
+        -- | Address is in abstract namespace which is a Linux-specific feature
+        -- that allows us to bind a UNIX domain socket to a name without that
+        -- name being created in the file system.
+        | SocketAddressUnixAbstract ByteString
+        deriving (Eq, Show)
 
 -- | The maximal length of a address path.
 -- SUSv3 doesn’t specify the size of the sun_path field. Early BSD
@@ -97,3 +100,4 @@ instance Storable (SocketAddress Unix) where
       where
         sun_family = (#ptr struct sockaddr_un, sun_family)
         sun_path   = (#ptr struct sockaddr_un, sun_path)
+
