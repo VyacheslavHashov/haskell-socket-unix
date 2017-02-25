@@ -1,5 +1,5 @@
 name:                socket-unix
-version:             0.1.1.0
+version:             0.2.0.0
 synopsis:            Unix domain sockets
 description:         A Unix domain socket extension for the socket library
 homepage:            https://github.com/vyacheslavhashov/haskell-socket-unix#readme
