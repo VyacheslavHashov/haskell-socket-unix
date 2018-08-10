@@ -8,17 +8,18 @@ A Unix domain socket API for the [socket](https://github.com/lpeterse/haskell-so
 Creating the Unix domain socket:
 ```haskell
 import System.Socket
+import System.Socket.Protocol.Default
 import System.Socket.Type.Stream
 import System.Socket.Family.Unix
 
-s <- socket :: IO (Socket Unix Stream Unix)
+s <- socket :: IO (Socket Unix Stream Default)
 ```
 
 Creating the address for binding/connecting
 ```haskell
 address <- case socketAddressUnixPath "example.sock" of
              Just addr -> pure addr
-             Nothing -> putStrLn "invalid pathname for socket"
+             Nothing -> fail "invalid pathname for socket"
 ```
 ### Symlinks
 Binding to a socket with a filename creates a socket in the filesystem, but does not unlink it after `close` called. You should handle deleting links yourself.
