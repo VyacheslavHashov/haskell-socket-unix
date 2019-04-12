@@ -1,0 +1,12 @@
+resolver: lts-13.16
+
+packages:
+- '.'
+extra-deps:
+- socket-0.8.2.0
+
+# Override default flag values for local packages and extra-deps
+flags: {}
+
+# Extra package databases containing global packages
+extra-package-dbs: []
